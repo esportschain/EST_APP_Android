@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/app_bg">
+
+    <ImageView
+        android:id="@+id/iv_home_no_games"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="13dp"
+        android:background="@mipmap/steam_logo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_home_no_games_title"
+        style="@style/text_16_DE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/jeffrey_mcguire"
+        app:layout_constraintLeft_toRightOf="@+id/iv_home_no_games"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_home_no_games_content"
+        style="@style/text_14_61_00"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="18dp"
+        android:background="#F0F0F0F0"
+        android:paddingBottom="40dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="12dp"
+        android:text="@string/jeffrey_mcguire_content"
+        app:layout_constraintTop_toBottomOf="@+id/tv_home_no_games_title" />
+
+</android.support.constraint.ConstraintLayout>

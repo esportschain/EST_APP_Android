@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="app_bg">#FFFFFFFF</color>
+
+    <!--APP Color-->
+    <color name="bt_blue">#31B4FF</color>
+    <color name="bt_gray">#C3CBCF</color>
+    <color name="et_gray">#ECF1F4</color>
+    <color name="dialog_gray_line">#F0F0F0</color>
+    <color name="transparent">#00000000</color>
+    <color name="view_line">#DCDCDC</color>
+
+    <color name="text_A3_color_00">#A3000000</color>
+    <color name="text_FF_color_00">#FF000000</color>
+    <color name="text_DE_color_00">#DE000000</color>
+    <color name="text_E0_color_00">#E0000000</color>
+    <color name="text_FF_color_FF">#FFFFFFFF</color>
+    <color name="text_61_color_00">#61000000</color>
+    <color name="text_FF_color_FA">#FA4731</color>
+    <color name="text_FF_color_38">#38C151</color>
+
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/layout_corner_gray_bg_white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_wallet_dialog_title"
+                    style="@style/text_16_DE"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/enter_your_eth_wallet_address" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="14dp" />
+
+                <EditText
+                    android:id="@+id/et_wallet_address"
+                    style="@style/text_16_DE"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginRight="14dp"
+                    android:background="@drawable/layout_corner_et_gray_bg_gray"
+                    android:inputType="text"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp" />
+
+                <Button
+                    android:id="@+id/bt_wallet_next"
+                    style="@style/text_16_FF"
+                    android:layout_width="120dp"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/layout_corner_blue_bg_blue"
+                    android:text="@string/next" />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

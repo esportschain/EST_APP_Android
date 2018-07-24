@@ -1,0 +1,126 @@
+<resources>
+
+    <string name="app_name">Esports</string>
+
+    <string name="sign_up_code_time">Resend (%1$s)</string>
+    <string name="take_picture">Camera</string>
+    <string name="photo_album">Album</string>
+    <string name="cancel">Cancel</string>
+    <!--<string name="log_out">退出登录</string>-->
+    <!--退出登录之后您的信息将要被删除-->
+    <string name="log_out_infor_clear">Your information will be deleted after logging out</string>
+    <!--<string name="confirm">确定</string>-->
+
+    <!--layout-->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="next">NEXT</string>
+    <string name="login_name">ESports Chain</string>
+    <string name="login_content">   exchange your game stats for ESports Token, and minie EST by playing your favourite computer game.</string>
+    <string name="steam">Steam</string>
+    <string name="facebook">Facebook</string>
+    <string name="login_in_with_email">Log in with Email</string>
+    <string name="or">or</string>
+    <string name="sign_up_with_email">Sign up with email</string>
+    <string name="profile">Profile</string>
+    <string name="logout">Logout</string>
+    <string name="email_address">Enter Your Email Address</string>
+    <string name="nick_name">Nickname</string>
+    <string name="finish">Finish</string>
+    <string name="inbox_and_enter_verification">Check inbox and enter verification code</string>
+    <string name="old_password">Set old password</string>
+    <string name="password_instructions">6-8 numbers or letters</string>
+    <string name="set_your_password">Set your password</string>
+    <string name="enter_your_password_again">Enter your password again</string>
+    <string name="est_to_eht_wallet">Withdraw EST to my ETH Wallet</string>
+    <string name="amount">Amount&#160;:&#160;&#160;</string>
+    <string name="wallet_address">Address&#160;:&#160;&#160;</string>
+    <string name="confirm">Confirm</string>
+    <string name="enter_your_eth_wallet_address">Enter your ETH Wallet Address</string>
+    <string name="est_wallet">EST Wallet</string>
+    <string name="my_games_statistics">My Game Statistics</string>
+    <string name="games">Games</string>
+    <string name="winrate">WINRATE</string>
+    <string name="kda">KDA</string>
+    <string name="mmr">MMR</string>
+    <string name="login_with_your_steam_account">Login with your Steam Account</string>
+    <string name="get_your_game_stats_and_est_bonus">Get your game stats and EST bonus </string>
+    <string name="jeffrey_mcguire">Jeffrey McGuire</string>
+    <string name="jeffrey_mcguire_content">We find that you\'d never played DOTA2 and PUBG, but don\'t worry, we are developing new function which could caculate all of your steam game accomplishments to EST, so be patient, once we completes, you will get EST rewards.</string>
+    <string name="my_est">MY EST</string>
+    <string name="transcations">Transcations</string>
+
+    <!--UI界面-->
+    <string name="est">&#160;&#160;EST</string>
+    <string name="bind_title">Bind</string>
+    <string name="game_detail_title">PUBG Stats</string>
+    <string name="email_login_title">Log in with Email</string>
+    <!--邮箱格式不正确-->
+    <string name="email_format_is_incorrect">Email format is incorrect</string>
+    <!--请输入密码-->
+    <string name="please_enter_your_password">Please enter your password</string>
+    <!--请输入原密码-->
+    <string name="pleases_enter_original_password">Please enter the original password</string>
+    <!--请再次输入密码-->
+    <string name="please_password_again">Please enter your password again</string>
+    <!--两次输入的密码不一致-->
+    <string name="password_twice_is_inconsistent">The password entered twice is inconsistent</string>
+    <!--修改密码成功-->
+    <string name="modify_password_success">Password has been updated</string>
+    <string name="please_enter_your_email">please enter your email</string>
+    <!--//The password must be between 6-16 digits, Alphanumeric combination-->
+    <string name="password_digits">The password must be between 6-16 digits, Alphanumeric combination</string>
+
+    <string name="login_success">login success</string>
+    <string name="sign_up_title">Sign up with email</string>
+    <!--验证码已经发送-->
+    <string name="code_been_send">Verification code has been sent</string>
+    <!--//请输入昵称-->
+    <string name="please_enter_nickname">Please enter a nickname</string>
+    <!--//请选择头像-->
+    <string name="please_choose_avatar">Please choose avatar</string>
+    <!--//registration success-->
+    <string name="sign_up_success">Registration success</string>
+    <string name="verification_code">Verification code</string>
+    <!--//请输入验证码-->
+    <string name="please_enter_code">Please enter verification code</string>
+    <!--验证码格式错误-->
+    <string name="code_format_error">Invalid verification code format</string>
+    <string name="setting_title">Settings</string>
+    <string name="wallet_title">EST Wallet</string>
+    <!--请输入浅钱包地址信息-->
+    <string name="please_enter_wallet_address">Please enter wallet address</string>
+    <!--提现成功-->
+    <string name="withdraw_success">Your withdraw request is under processing, once it complete, we will send you a App notification.  </string>
+    <!--提现失败-->
+    <string name="cash_withdrawal_failure">Cash withdrawal failure</string>
+    <!--余额不足-->
+    <string name="insufficient_balance">Your EST amount is less than 30, so you can\'t withdraw EST now. You can play more games  to get more EST</string>
+    <!--再按一次退出-->
+    <string name="to_exit">Press again to exit</string>
+    <!--recent match-->
+    <string name="recent_match">Recent Matches</string>
+    <!--刷新控件英文定义-->
+    <string name="header_pulling">pull down to refresh</string>
+    <string name="header_refreshing">release to refresh…</string>
+    <string name="header_loading">refreshing…</string>
+    <string name="header_release">release immediate refresh</string>
+    <string name="header_finish">release complete</string>
+    <string name="header_failed">release failed</string>
+    <string name="header_update">\'Last update\' M-d HH:mm</string>
+
+    <string name="footer_pulling">pull up to load more</string>
+    <string name="footer_release">release to load more</string>
+    <string name="footer_loading">loading…</string>
+    <string name="footer_refreshing">refreshing…</string>
+    <string name="footer_finish">loading complete</string>
+    <string name="footer_failed">failed to load</string>
+    <string name="footer_nothing">no more data</string>
+
+    <!--没有权限提示信息-->
+    <string name="prompt_message">Prompt message</string>
+    <string name="app_lacks">The current app lacks the necessary permissions and is temporarily unavailable. If necessary, click the [OK] button to go to the Settings Center for authorization.</string>
+
+
+
+</resources>
