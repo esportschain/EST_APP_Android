@@ -37,8 +37,7 @@ public interface ApiStores {
     public static final String APP_M_UPDATE = "updated";
 
     interface Url {
-        //String BASE_URL = "http://www.esportschain.com";
-        String BASE_URL = "https://dev.esportschain.org";
+        String BASE_URL = "http://www.esportschain.com";
     }
 
     //登录
@@ -266,7 +265,7 @@ public interface ApiStores {
             @Field("address") String address,
             @Field("type") String type);
 
-    //提现手续费 type = 1
+
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=putForward
