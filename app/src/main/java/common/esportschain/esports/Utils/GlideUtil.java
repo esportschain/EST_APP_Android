@@ -2,21 +2,15 @@ package common.esportschain.esports.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.youcheng.publiclibrary.utils.UIUtil;
-
-import java.io.ByteArrayOutputStream;
 
 import common.esportschain.esports.R;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/5
  */
@@ -30,11 +24,11 @@ public class GlideUtil {
      * @param mImageView 控件
      */
     public static void loadImg(Context mContext, String path, ImageView mImageView) {
-//        if (!TextUtils.isEmpty(path)) {
-//            Glide.with(mContext).load(path).error(R.mipmap.icon_default).into(mImageView);
-//        } else {
-//            Glide.with(mContext).load(R.mipmap.icon_default).into(mImageView);
-//        }
+        if (!TextUtils.isEmpty(path)) {
+            Glide.with(mContext).load(path).into(mImageView);
+        } else {
+            Glide.with(mContext).load(R.mipmap.icon_default).into(mImageView);
+        }
     }
 
     /**
@@ -123,6 +117,33 @@ public class GlideUtil {
      * @param path       图片路径
      * @param mImageView 控件
      */
+//    public static void loadRandAvatar(Context mContext, String path, ImageView mImageView) {
+//
+//        if (!TextUtils.isEmpty(path)) {
+//
+//            RequestOptions requestOptions = new RequestOptions()
+//                    .transform(new GlideCircleTransform(mContext))
+//                    .error(R.mipmap.icon_default);
+//
+//
+//            Glide.with(mContext).load(path).apply(requestOptions).into(mImageView);
+//        } else {
+//            RequestOptions requestOptions = new RequestOptions()
+//                    .centerCrop()
+//                    .transform(new GlideCircleTransform(mContext));
+//
+//            Glide.with(mContext).load(R.mipmap.icon_default).apply(requestOptions).into(mImageView);
+//        }
+//    }
+
+
+    /**
+     * 快速加载圆形图片
+     *
+     * @param mContext   上下文
+     * @param path       图片路径
+     * @param mImageView 控件
+     */
     public static void loadRandImg(Context mContext, String path, ImageView mImageView) {
         if (!TextUtils.isEmpty(path)) {
             RequestOptions requestOptions = new RequestOptions()
@@ -142,14 +163,12 @@ public class GlideUtil {
     public static void loadRandImg(Context mContext, int path, ImageView mImageView) {
         if (0 != path) {
             RequestOptions requestOptions = new RequestOptions()
-                    .fitCenter()
                     .transform(new GlideCircleTransform(mContext))
                     .error(R.mipmap.icon_default);
 
             Glide.with(mContext).load(path).apply(requestOptions).into(mImageView);
         } else {
             RequestOptions requestOptions = new RequestOptions()
-                    .centerCrop()
                     .transform(new GlideCircleTransform(mContext));
 
             Glide.with(mContext).load(R.mipmap.icon_default).apply(requestOptions).into(mImageView);

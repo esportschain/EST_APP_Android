@@ -76,6 +76,13 @@ public class LoginActivity extends MvpActivity<LoginPresenter> implements LoginV
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //注销注册
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void initData() {
         super.initData();
     }
@@ -140,12 +147,6 @@ public class LoginActivity extends MvpActivity<LoginPresenter> implements LoginV
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //注销注册
-        EventBus.getDefault().unregister(this);
-    }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

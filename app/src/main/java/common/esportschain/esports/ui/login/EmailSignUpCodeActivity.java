@@ -7,6 +7,7 @@ import android.os.CountDownTimer;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,18 +22,19 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import common.esportschain.esports.R;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.mvp.model.EmailSignUpCodeModel;
+import common.esportschain.esports.mvp.model.EmailSignUpModel;
 import common.esportschain.esports.mvp.presenter.EmailSignUpCodePresenter;
 import common.esportschain.esports.mvp.view.EmailSignUpCodeView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.request.AuthParam;
 import common.esportschain.esports.request.AuthSIG;
 import common.esportschain.esports.utils.ToastUtil;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/13
  */
@@ -69,35 +71,26 @@ public class EmailSignUpCodeActivity extends MvpActivity<EmailSignUpCodePresente
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+        //注销注册
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         tvTitle.setText(getResources().getString(R.string.verification_code));
         ivBack.setImageResource(R.mipmap.back);
         brand = String.format(getResources().getString(R.string.sign_up_code_time), "60");
         tvSignUpTime.setText(brand);
-
-        //按钮显示倒计时
-        timer = new CountDownTimer(60 * 1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                String brand = String.format(getResources().getString(R.string.sign_up_code_time), millisUntilFinished / 1000);
-                //SpannableStringBuilder  初始化
-                SpannableString spannableString = new SpannableString(brand);
-                //设置文字颜色  文字颜色  文字开始截取的位置  文字结束的位置 设置属性
-                spannableString.setSpan(new ForegroundColorSpan(
-                                Color.parseColor("#31B4FF")),
-                        spannableString.length() - 3,
-                        spannableString.length() - 1,
-                        Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-
-                tvSignUpTime.setText(spannableString);
-            }
-
-            @Override
-            public void onFinish() {
-                tvSignUpTime.setText(brand);
-            }
-        }.start();
+        timer();
     }
 
     @Override
@@ -110,20 +103,22 @@ public class EmailSignUpCodeActivity extends MvpActivity<EmailSignUpCodePresente
         return R.layout.activity_sign_up_code;
     }
 
-    @OnClick({R.id.iv_back, R.id.bt_email_sign_up_input_code})
+    @OnClick({R.id.iv_back, R.id.bt_email_sign_up_input_code, R.id.tv_sign_up_time})
     public void onClick(View view) {
         if (view.equals(ivBack)) {
             finish();
         } else if (view.equals(btEmailSignUpInputCode)) {
 //            pushActivity(this, EmailSignUpPasswordActivity.class);
-
-            mParam = AuthParam.AuthParam("", "");
-            mSig = AuthSIG.AuthToken("Member", "App", "checkVcode", "-1", "", "");
             if (etSignUpCode.getText() != null) {
                 if (etSignUpCode.getText().toString().length() == 4) {
                     mCode = etSignUpCode.getText().toString();
                     UserInfo userInfo = new UserInfoDbManger().loadAll().get(0);
                     mEmail = userInfo.getEmail();
+
+                    mParam = AuthParam.AuthParam("", "");
+                    mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_CHECKV_CODE,
+                            "email", mEmail, "vcode", mCode, "", "", "-1", mParam);
+
                     mvpPresenter.getVerificationCode(mParam, mSig, mEmail, mCode);
                 } else {
                     ToastUtil.showToast(getResources().getString(R.string.code_format_error));
@@ -131,6 +126,16 @@ public class EmailSignUpCodeActivity extends MvpActivity<EmailSignUpCodePresente
             } else {
                 ToastUtil.showToast(getResources().getString(R.string.please_enter_code));
             }
+        } else if (view.equals(tvSignUpTime)) {
+
+            UserInfo userInfo = new UserInfoDbManger().loadAll().get(0);
+            mEmail = userInfo.getEmail();
+
+            mParam = AuthParam.AuthParam("", "");
+            mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_SEND_VCODE,
+                    "email", mEmail, "", "", "", "", "-1", mParam);
+            mvpPresenter.getCode(mParam, mSig, mEmail);
+
         }
     }
 
@@ -149,6 +154,12 @@ public class EmailSignUpCodeActivity extends MvpActivity<EmailSignUpCodePresente
         startActivity(intent);
     }
 
+    @Override
+    public void getCodeSuccess(EmailSignUpModel emailSignUpModel) {
+        timer();
+        ToastUtil.showToast(getResources().getString(R.string.code_been_send));
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void messageEventBus(SignUpEvent event) {
         if ("1".equals(event.mSignUpSuccess)) {
@@ -156,16 +167,49 @@ public class EmailSignUpCodeActivity extends MvpActivity<EmailSignUpCodePresente
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
+    private void timer() {
+        //按钮显示倒计时
+        timer = new CountDownTimer(60 * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                String brand = String.format(getResources().getString(R.string.sign_up_code_time), millisUntilFinished / 1000);
+                //SpannableStringBuilder  初始化
+                SpannableString spannableString = new SpannableString(brand);
+                if (11 == brand.length()) {
+                    //设置文字颜色  文字颜色  文字开始截取的位置  文字结束的位置 设置属性
+                    spannableString.setSpan(new ForegroundColorSpan(
+                                    Color.parseColor("#31B4FF")),
+                            spannableString.length() - 3,
+                            spannableString.length() - 2,
+                            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                } else {
+                    //设置文字颜色  文字颜色  文字开始截取的位置  文字结束的位置 设置属性
+                    spannableString.setSpan(new ForegroundColorSpan(
+                                    Color.parseColor("#31B4FF")),
+                            spannableString.length() - 4,
+                            spannableString.length() - 2,
+                            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                }
+
+                tvSignUpTime.setText(spannableString);
+                tvSignUpTime.setClickable(false);
+            }
+
+            @Override
+            public void onFinish() {
+                tvSignUpTime.setText(brand);
+                //SpannableStringBuilder  初始化
+                SpannableString spannableString = new SpannableString(brand);
+                //设置文字颜色  文字颜色  文字开始截取的位置  文字结束的位置 设置属性
+                spannableString.setSpan(new ForegroundColorSpan(
+                                Color.parseColor("#31B4FF")),
+                        0,
+                        spannableString.length() - 6,
+                        Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                tvSignUpTime.setText(spannableString);
+                tvSignUpTime.setClickable(true);
+            }
+        }.start();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        timer.cancel();
-        //注销注册
-        EventBus.getDefault().unregister(this);
-    }
 }

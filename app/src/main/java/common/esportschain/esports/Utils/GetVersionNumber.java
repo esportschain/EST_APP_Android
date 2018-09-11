@@ -1,7 +1,5 @@
 package common.esportschain.esports.utils;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 

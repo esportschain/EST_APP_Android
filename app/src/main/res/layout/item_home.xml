@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/iv_home_games_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginLeft="14dp"
         android:layout_marginTop="14dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -23,7 +23,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="16dp"
         app:layout_constraintLeft_toRightOf="@+id/iv_home_games_logo"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:text=""/>
 
     <TextView
         android:id="@+id/tv_home_games_nickname"

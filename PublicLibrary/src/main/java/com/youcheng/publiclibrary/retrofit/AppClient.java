@@ -22,24 +22,26 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
-
+/**
+ * Retrofit client 网络框架
+ * @author qiaozhenxin
+ */
 public class AppClient {
     public static Retrofit mRetrofit;
     /**
-  
+     * 服务端域名或ip
      */
     private static String API_SERVER_URL;
     /**
-
+     * 连接超时时间,单位  秒
      */
     private static final int CONN_TIMEOUT = 30;
     /**
-
+     * 读取超时时间,单位  秒
      */
     private static final int READ_TIMEOUT = 20;
     /**
-
+     * 设置写的超时时间,单位  秒
      */
     private static final int WRITE_TIMEOUT = 20;
 
@@ -54,10 +56,10 @@ public class AppClient {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
             if (BuildConfig.DEBUG) {
-
+                // Log信息拦截器
                 HttpLoggingInterceptorM loggingInterceptor = new HttpLoggingInterceptorM();
                 loggingInterceptor.setLevel(HttpLoggingInterceptorM.Level.BODY);
-
+                //设置 Debug Log 模式
                 builder.addInterceptor(loggingInterceptor);
             }
             builder.connectTimeout(CONN_TIMEOUT, TimeUnit.SECONDS)

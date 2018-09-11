@@ -1,13 +1,12 @@
 package common.esportschain.esports.mvp.model;
 
 import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 import com.youcheng.publiclibrary.base.BaseClassResultBean;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/15
  */
@@ -40,18 +39,27 @@ public class HomeModel extends BaseClassResultBean<HomeModel.Object> {
     public class HomeUserModel {
 
         /**
-         * uid : 10
-         * nickname : liang1234
-         * avatar : http://www.esportschain.com/uploads/avatar/10.png
-         * money : 0.000000000
-         * steam_status : 0
+         * "uid": 1,           // 用户id
+         * "nickname": "hq",   // 用户昵称
+         * "avatar": "http://www.esportschain.com/uploads/avatar/1.png",   // 用户头像
+         * "money": "50.000000000",                                        // 钱包余额
+         * "status": 3, // 用户状态 1未绑定steam 2用户游戏列表为空或未开放权限(此时存在msg提示) 3正常显示帐号列表
+         * "msg": "",   // 状态的错误消息
+         * "popup": [   // 弹窗及其他，目前只有弹窗，list内有几个按顺序弹几个
+         * {
+         * "pid": "1_1",  // 弹窗ID,设置已读消息用
+         * "type": 1,     // 1为弹窗
+         * "msg": "Congratulations! Your PUBG account verification is finished，you can withdraw your EST now！" // 弹窗内容
+         * }
+         * ]
          */
-
         private String uid;
         private String nickname;
         private String avatar;
         private String money;
-        private String steam_status;
+        private int status;
+        private String msg;
+        private List<PopupBean> popup;
 
         public String getUid() {
             return uid;
@@ -85,39 +93,112 @@ public class HomeModel extends BaseClassResultBean<HomeModel.Object> {
             this.money = money;
         }
 
-        public String getSteam_status() {
-            return steam_status;
+        public int getStatus() {
+            return status;
         }
 
-        public void setSteam_status(String steam_status) {
-            this.steam_status = steam_status;
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+
+        public List<PopupBean> getPopup() {
+            return popup;
+        }
+
+        public void setPopup(List<PopupBean> popup) {
+            this.popup = popup;
+        }
+
+        public class PopupBean {
+            /**
+             * pid : 1_1
+             * type : 1
+             * msg : Congratulations! Your PUBG account verification is finished，you can withdraw your EST now！
+             */
+
+            private String pid;
+            private int type;
+
+            @SerializedName("msg")
+            private String msgX;
+
+            public String getPid() {
+                return pid;
+            }
+
+            public void setPid(String pid) {
+                this.pid = pid;
+            }
+
+            public int getType() {
+                return type;
+            }
+
+            public void setType(int type) {
+                this.type = type;
+            }
+
+            public String getMsgX() {
+                return msgX;
+            }
+
+            public void setMsgX(String msgX) {
+                this.msgX = msgX;
+            }
         }
     }
 
     public class HomeModelAccountListModel {
         /**
-         * name:
-         * icon : http://www.esportschain.com/images/pubg.png
-         * accountname : 4564
-         * uri : {"d":"App","c":"Pubg","m":"detail","accountname":"4564"} 把jsonObject转String 类型 不确定key有几个
-         * "stats" : [{"field": "Games","val":"6"}]  "matchnum":"307","winnum":"6","toptennum":"51","kdr":"1.59"}
+         * {
+         * "icon": "http://www.esportschain.com/images/pubg.png",
+         * "name": "PLAYERUNKNOWN'S BATTLEGROUNDS",
+         * "gametype": 9,
+         * "account_status": 1,
+         * "account_msg": "",
+         * "detail": {
+         * "accountname": "bluesky_baiyun",
+         * "uri": {
+         * "d": "App",
+         * "c": "Pubg",
+         * "m": "detail",
+         * "accountname": "bluesky_baiyun"
+         * },
+         * "stats": [{
+         * "field": "Games",
+         * "val": "307"
+         * },
+         * {
+         * "field": "Win",
+         * "val": "6"
+         * },
+         * {
+         * "field": "Top10",
+         * "val": "51"
+         * },
+         * {
+         * "field": "KDR",
+         * "val": "1.59"
+         * }
+         * ]
+         * }
+         * }
          */
 
-
-
-        private String name;
         private String icon;
-        private String accountname;
-        private JsonObject uri;
-        private ArrayList<StatusModelItem> status;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
+        private String name;
+        private int gametype;
+        private int account_status;
+        private String account_msg;
+        private DetailBean detail;
 
         public String getIcon() {
             return icon;
@@ -127,55 +208,109 @@ public class HomeModel extends BaseClassResultBean<HomeModel.Object> {
             this.icon = icon;
         }
 
-        public String getAccountname() {
-            return accountname;
+        public String getName() {
+            return name;
         }
 
-        public void setAccountname(String accountname) {
-            this.accountname = accountname;
+        public void setName(String name) {
+            this.name = name;
         }
 
-        public JsonObject getUri() {
-            return uri;
+        public int getGametype() {
+            return gametype;
         }
 
-        public void setUri(JsonObject uri) {
-            this.uri = uri;
+        public void setGametype(int gametype) {
+            this.gametype = gametype;
         }
 
-        public ArrayList<StatusModelItem> getStatus() {
-            return status;
+        public int getAccount_status() {
+            return account_status;
         }
 
-        public void setStatus(ArrayList<StatusModelItem> status) {
-            this.status = status;
-        }
-    }
-
-    public class StatusModelItem{
-
-        /**
-         * field : Games
-         * val : 6
-         */
-
-        private String field;
-        private String val;
-
-        public String getField() {
-            return field;
+        public void setAccount_status(int account_status) {
+            this.account_status = account_status;
         }
 
-        public void setField(String field) {
-            this.field = field;
+        public String getAccount_msg() {
+            return account_msg;
         }
 
-        public String getVal() {
-            return val;
+        public void setAccount_msg(String account_msg) {
+            this.account_msg = account_msg;
         }
 
-        public void setVal(String val) {
-            this.val = val;
+        public DetailBean getDetail() {
+            return detail;
+        }
+
+        public void setDetail(DetailBean detail) {
+            this.detail = detail;
+        }
+
+        public class DetailBean {
+            /**
+             * accountname : bluesky_baiyun
+             * uri : {"d":"App","c":"Pubg","m":"detail","accountname":"bluesky_baiyun"}
+             * stats : [{"field":"Games","val":"307"},{"field":"Win","val":"6"},{"field":"Top10","val":"51"},{"field":"KDR","val":"1.59"}]
+             */
+
+            private String accountname;
+            private JsonObject uri;
+
+            public JsonObject getUri() {
+                return uri;
+            }
+
+            public void setUri(JsonObject uri) {
+                this.uri = uri;
+            }
+
+            private List<StatsBean> stats;
+
+            public String getAccountname() {
+                return accountname;
+            }
+
+            public void setAccountname(String accountname) {
+                this.accountname = accountname;
+            }
+
+
+
+            public List<StatsBean> getStats() {
+                return stats;
+            }
+
+            public void setStats(List<StatsBean> stats) {
+                this.stats = stats;
+            }
+
+            public class StatsBean {
+                /**
+                 * field : Games
+                 * val : 307
+                 */
+
+                private String field;
+                private String val;
+
+                public String getField() {
+                    return field;
+                }
+
+                public void setField(String field) {
+                    this.field = field;
+                }
+
+                public String getVal() {
+                    return val;
+                }
+
+                public void setVal(String val) {
+                    this.val = val;
+                }
+            }
         }
     }
 }

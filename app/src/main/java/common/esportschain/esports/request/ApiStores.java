@@ -8,11 +8,12 @@ import common.esportschain.esports.mvp.model.EmailSignUpCodeModel;
 import common.esportschain.esports.mvp.model.EmailSignUpModel;
 import common.esportschain.esports.mvp.model.EmailSignUpPasswordModel;
 import common.esportschain.esports.mvp.model.HomeModel;
-import common.esportschain.esports.mvp.model.LoginModel;
 import common.esportschain.esports.mvp.model.NullModel;
 import common.esportschain.esports.mvp.model.SettingModel;
+import common.esportschain.esports.mvp.model.VerifyAccountModel;
 import common.esportschain.esports.mvp.model.WalletModel;
 import common.esportschain.esports.mvp.model.WalletTexModel;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -35,15 +36,33 @@ public interface ApiStores {
     public static final String APP_M_PUTFORWARD = "putForward";
     public static final String APP_M_DETAIL = "detail";
     public static final String APP_M_UPDATE = "updated";
+    public static final String APP_M_LOGIN = "login";
+    public static final String APP_M_CHECKV_CODE = "checkVcode";
+    public static final String APP_M_MODIFY_PASSWORD = "modifyPwd";
+    public static final String APP_M_SEND_VCODE = "sendVcode";
+    public static final String APP_M_SMODIFY_AVATAR = "modifyAvatar";
+    public static final String APP_M_BIND_ID = "bindid";
+    public static final String APP_M_GET_GAME_AUTH_DETAIL = "getGameAuthDetail";
+    public static final String APP_M_BIND_ACCOUNT_TPL = "bindAccountTpl";
+    public static final String APP_M_BIND_ACCOUNT = "bindAccount";
+    public static final String APP_M_SUBMIT_GAME_AUTH = "submitGameAuth";
+    public static final String APP_M_REGISTER = "register";
+    public static final String APP_M_READ_MSG = "readMsg";
+
+
+    public static final String APP_GAME_TYPE = "gametype";
+    public static final String APP_PAGE = "page";
+    public static final String APP_PiD = "pid";
 
     interface Url {
-        String BASE_URL = "http://www.esportschain.com";
+        //String BASE_URL = "http://www.esportschain.com";
+//        String BASE_URL = "https://dev.esportschain.org";
+        String BASE_URL = "https://esportschain.org/";
     }
-
-    //登录
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=login
+     * 登录
      *
      * @param param
      * @param sig
@@ -67,10 +86,9 @@ public interface ApiStores {
             @Field("pwd") String pwd);
 
 
-    //发送验证码
-
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=sendVcode
+     * 发送验证码
      *
      * @param param
      * @param c
@@ -90,10 +108,9 @@ public interface ApiStores {
             @Query("sig") String sig,
             @Field("email") String email);
 
-    //验证码验证
-
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=checkVcode
+     * 验证码验证
      *
      * @param param
      * @param sig
@@ -115,19 +132,17 @@ public interface ApiStores {
             @Field("email") String email,
             @Field("vcode") String vcode);
 
-    //注册
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=register
+     * 注册
      *
      * @param param
      * @param sig
      * @param c
      * @param d
      * @param m
-     * @param paramsText
-     * @param params
-     * @param file
+     * @param part
      * @return
      */
     @Multipart
@@ -138,14 +153,38 @@ public interface ApiStores {
             @Query("c") String c,
             @Query("d") String d,
             @Query("m") String m,
-            @PartMap Map<String, RequestBody> paramsText,
-            @PartMap Map<String, RequestBody> params,
-            @Part("avatar\"; filename=\"avatarPhoto.jpg") RequestBody file);
+            @PartMap Map<String, RequestBody> body,
+            @Part MultipartBody.Part part);
 
-    //修改密码
+    /**
+     * 注册没有上传头像
+     *
+     * @param param
+     * @param sig
+     * @param c
+     * @param d
+     * @param m
+     * @param body
+     * @param sig
+     * @param c
+     * @param d
+     * @param m
+     * @return
+     */
+    @Multipart
+    @POST("app.php")
+    Observable<EmailSignUpAvatarModel> postSignUpData(
+            @Query("_param") String param,
+            @Query("sig") String sig,
+            @Query("c") String c,
+            @Query("d") String d,
+            @Query("m") String m,
+            @PartMap Map<String, RequestBody> body);
+
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=modifyPwd
+     * 修改密码
      *
      * @param param
      * @param sig
@@ -157,6 +196,7 @@ public interface ApiStores {
      * @param rnewPwd
      * @return
      */
+
     @FormUrlEncoded
     @POST("app.php")
     Observable<EmailSignUpPasswordModel> postMidifyPassword(
@@ -169,10 +209,9 @@ public interface ApiStores {
             @Field("new_pwd") String newPwd,
             @Field("rnew_pwd") String rnewPwd);
 
-    //个人中心
-
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=detail
+     * 个人中心
      *
      * @param param
      * @param sig
@@ -192,18 +231,17 @@ public interface ApiStores {
             @Query("m") String m,
             @Field("page") String page);
 
-    //修改头像
+    //
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=modifyAvatar
+     * 修改头像
      *
      * @param param
      * @param sig
      * @param c
      * @param d
      * @param m
-     * @param params
-     * @param file
      * @return
      */
     @Multipart
@@ -214,13 +252,11 @@ public interface ApiStores {
             @Query("c") String c,
             @Query("d") String d,
             @Query("m") String m,
-            @PartMap Map<String, RequestBody> params,
-            @Part("avatar\"; filename=\"avatarPhoto.jpg") RequestBody file);
-
-    //钱包
+            @Part MultipartBody.Part part);
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=wallet
+     * 钱包
      *
      * @param param
      * @param sig
@@ -240,10 +276,11 @@ public interface ApiStores {
             @Query("m") String m,
             @Field("page") String page);
 
-    //提现请求  type = 2
+    //
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=putForward
+     * 提现请求  type = 2
      *
      * @param param
      * @param sig
@@ -265,10 +302,11 @@ public interface ApiStores {
             @Field("address") String address,
             @Field("type") String type);
 
-
+    //
 
     /**
      * http://www.esportschain.com/app.php?d=App&c=Member&m=putForward
+     * 提现手续费 type = 1
      *
      * @param param
      * @param sig
@@ -291,7 +329,7 @@ public interface ApiStores {
             @Field("type") String type);
 
     /**
-     * Unauthorized
+     * 提交deviceToken
      *
      * @param param
      * @param sig
@@ -310,4 +348,80 @@ public interface ApiStores {
             @Query("d") String d,
             @Query("m") String m,
             @Field("device_token") String deviceToken);
+
+    /**
+     * http://www.esportschain.com/app.php?d=App&c=Member&m=getGameAuthDetail
+     * 获取绑定账号的数据
+     *
+     * @param param
+     * @param sig
+     * @param c
+     * @param d
+     * @param m
+     * @param bindid
+     * @return
+     */
+    @GET("app.php")
+    Observable<VerifyAccountModel> getVerifyData(@Query("_param") String param,
+                                                 @Query("sig") String sig,
+                                                 @Query("c") String c,
+                                                 @Query("d") String d,
+                                                 @Query("m") String m,
+                                                 @Query("bindid") String bindid);
+
+    @FormUrlEncoded
+    @POST("app.php")
+    Observable<NullModel> postBindPudgData(
+            @Query("_param") String param,
+            @Query("sig") String sig,
+            @Query("c") String c,
+            @Query("d") String d,
+            @Query("m") String m,
+            @Field("gametype") String gametype,
+            @Field("data") String data);
+
+    //http://www.esportschain.com/app.php?d=App&c=Member&m=submitGameAuth
+
+    /**
+     * 上传认证图片
+     *
+     * @param param
+     * @param sig
+     * @param c
+     * @param d
+     * @param submitGameAuth
+     * @return
+     */
+
+    @Multipart
+    @POST("app.php")
+    Observable<VerifyAccountModel> postAuthimg(
+            @Query("_param") String param,
+            @Query("sig") String sig,
+            @Query("c") String c,
+            @Query("d") String d,
+            @Query("m") String submitGameAuth,
+            @Query("bindid") String bind,
+            @Part MultipartBody.Part part);
+
+
+    /**
+     * urldemo: http://www.esportschain.com/app.php?d=App&c=Member&m=readMsg
+     *
+     * @param param
+     * @param sig
+     * @param c
+     * @param d
+     * @param m
+     * @return
+     */
+    @GET("app.php")
+    Observable<NullModel> msgRead(
+            @Query("_param") String param,
+            @Query("sig") String sig,
+            @Query("c") String c,
+            @Query("d") String d,
+            @Query("m") String m,
+            @Query("pid") String pid);
+
 }

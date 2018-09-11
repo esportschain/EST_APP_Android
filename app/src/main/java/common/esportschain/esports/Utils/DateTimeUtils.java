@@ -1,15 +1,8 @@
 package common.esportschain.esports.utils;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ParseException;
 import android.text.format.Time;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

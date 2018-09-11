@@ -9,6 +9,7 @@ import common.esportschain.esports.EsportsApplication;
 import common.esportschain.esports.base.MyPresenter;
 import common.esportschain.esports.mvp.model.EmailSignUpModel;
 import common.esportschain.esports.mvp.view.EmailSignUpView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.utils.ToastUtil;
 
 /**
@@ -22,7 +23,7 @@ public class EmailSignUpPresenter extends MyPresenter<EmailSignUpView> {
     public void getCode(String param, String sig, String email) {
         mvpView.showLoading();
 
-        addSubscription(apiStores.getCode(param, "Member", "App", "sendVcode", sig, email), new ApiCallback<EmailSignUpModel>() {
+        addSubscription(apiStores.getCode(param, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_SEND_VCODE, sig, email), new ApiCallback<EmailSignUpModel>() {
             @Override
             public void onSuccess(EmailSignUpModel model) {
                 mvpView.dismissLoading();

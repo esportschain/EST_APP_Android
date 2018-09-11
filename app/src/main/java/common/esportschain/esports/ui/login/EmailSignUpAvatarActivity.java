@@ -9,8 +9,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,12 +25,13 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import common.esportschain.esports.R;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.mvp.model.EmailSignUpAvatarModel;
 import common.esportschain.esports.mvp.presenter.EmailSignUpAvatarPresenter;
 import common.esportschain.esports.mvp.view.EmailSignUpAvatarView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.request.AuthParam;
 import common.esportschain.esports.request.AuthSIG;
 import common.esportschain.esports.utils.GlideUtil;
@@ -70,6 +71,7 @@ public class EmailSignUpAvatarActivity extends MvpActivity<EmailSignUpAvatarPres
     private String mPNewPassword;
     private String mMD5PNewPassword;
     private String mKey;
+    private String type;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,9 +84,9 @@ public class EmailSignUpAvatarActivity extends MvpActivity<EmailSignUpAvatarPres
     @Override
     public void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
-        tvTitle.setText(getResources().getString(R.string.password));
+        tvTitle.setText(getResources().getString(R.string.profile));
         ivBack.setImageResource(R.mipmap.back);
-        GlideUtil.loadRandImg(this, R.mipmap.avatar, ivAvatar);
+        GlideUtil.loadRandImg(mActivity, R.mipmap.avatar_gary, ivAvatar);
     }
 
     @Override
@@ -104,19 +106,23 @@ public class EmailSignUpAvatarActivity extends MvpActivity<EmailSignUpAvatarPres
         } else if (view.equals(ivAvatar)) {
             chooseHeadPortrait();
         } else if (view.equals(btSignUpFinish)) {
-            if (etSignUpNickName.getText() != null) {
-                if (!"".equals(absolutePath)) {
-                    mParam = AuthParam.AuthParam("", "");
-                    mSig = AuthSIG.AuthToken("Member", "App", "register", "-1", "", "");
-                    UserInfo userInfo = new UserInfoDbManger().loadAll().get(0);
-                    mEmail = userInfo.getEmail();
-                    mKey = userInfo.getKey();
-                    mNickName = etSignUpNickName.getText().toString();
-                    mMD5NewPassword = MD5Util.encodeMD5(mNewPassword);
-                    mMD5PNewPassword = MD5Util.encodeMD5(mPNewPassword);
-                    mvpPresenter.uploadPhotoFile(mParam, mSig, mEmail, mNickName, mMD5NewPassword, mMD5PNewPassword, mKey, absolutePath);
+            if (null != etSignUpNickName.getText()) {
+
+                UserInfo userInfo = new UserInfoDbManger().loadAll().get(0);
+                mEmail = userInfo.getEmail();
+                mKey = userInfo.getKey();
+                mNickName = etSignUpNickName.getText().toString();
+                mMD5NewPassword = MD5Util.encodeMD5(mNewPassword);
+                mMD5PNewPassword = MD5Util.encodeMD5(mPNewPassword);
+
+                mParam = AuthParam.AuthParam("", "");
+                mSig = AuthSIG.AuthToken(mParam, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP,
+                        mEmail, mKey, ApiStores.APP_M_REGISTER, mNickName, mMD5NewPassword, mMD5PNewPassword);
+
+                if (null != absolutePath) {
+                    mvpPresenter.photoCompression(mParam, mSig, mEmail, mNickName, mMD5NewPassword, mMD5PNewPassword, mKey, mActivity, absolutePath, type);
                 } else {
-                    ToastUtil.showToast(getResources().getString(R.string.please_choose_avatar));
+                    mvpPresenter.postSignUp(mParam, mSig, mEmail, mNickName, mMD5NewPassword, mMD5PNewPassword, mKey);
                 }
             } else {
                 ToastUtil.showToast(getResources().getString(R.string.please_enter_nickname));
@@ -166,7 +172,8 @@ public class EmailSignUpAvatarActivity extends MvpActivity<EmailSignUpAvatarPres
                         @Override
                         public void onPermissionGranted() {
                             String outFileFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
-                            String outFilePath = "ESCAVATAR" + ".png";
+                            String currentTime = String.valueOf(System.currentTimeMillis());
+                            String outFilePath = currentTime + ".png";
                             File file = new File(outFileFolder, outFilePath);
                             absolutePath = file.getAbsolutePath();
                             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -183,7 +190,8 @@ public class EmailSignUpAvatarActivity extends MvpActivity<EmailSignUpAvatarPres
                     });
         } else {
             String outFileFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
-            String outFilePath = "ESCAVATAR" + ".png";
+            String currentTime = String.valueOf(System.currentTimeMillis());
+            String outFilePath = currentTime + ".png";
             File file = new File(outFileFolder, outFilePath);
             absolutePath = file.getAbsolutePath();
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -240,15 +248,16 @@ public class EmailSignUpAvatarActivity extends MvpActivity<EmailSignUpAvatarPres
             Cursor cursor = getContentResolver().query(uri, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 absolutePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                String aa = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                type = aa.substring(absolutePath.length() - 3, absolutePath.length());
+
                 if (!TextUtils.isEmpty(absolutePath)) {
                     cropPhoto();
                 }
             }
             //剪裁完毕上传文件
-        } else if (requestCode == 500) {
+        } else if (requestCode == 500 && resultCode == RESULT_OK) {
             GlideUtil.loadRandImg(this, absolutePath, ivAvatar);
-            Log.e("输出上传文件的图片路径", absolutePath);
-
         }
     }
 
@@ -281,6 +290,12 @@ public class EmailSignUpAvatarActivity extends MvpActivity<EmailSignUpAvatarPres
 
     public void showRefuse() {
         MPermissionUtils.showTipsDialog(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        MPermissionUtils.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

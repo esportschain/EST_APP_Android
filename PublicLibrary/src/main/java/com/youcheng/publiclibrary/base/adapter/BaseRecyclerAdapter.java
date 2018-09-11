@@ -42,9 +42,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseVi
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View itemView = LayoutInflater.from(mContext).inflate(getContentView(viewType), parent, false);
-
         return new BaseViewHolder(itemView);
     }
 
@@ -123,12 +121,16 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseVi
         mDataSetObservable.unregisterObserver(observer);
     }
 
-
+    /**
+     * 通知附件的观察者，底层数据已经更改，任何反映数据集的视图都应该刷新。
+     */
     public void notifyListDataSetChanged() {
         mDataSetObservable.notifyChanged();
     }
 
-
+    /**
+     * 通知附加的观察者，基础数据不再有效或可用。一旦调用此适配器不再有效，也不应报告进一步的数据集更改。
+     */
     public void notifyDataSetInvalidated() {
         mDataSetObservable.notifyInvalidated();
     }

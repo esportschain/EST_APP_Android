@@ -10,4 +10,6 @@ import common.esportschain.esports.mvp.view.BindWebViewView;
  */
 
 public class BindWebViewPresenter extends MyPresenter<BindWebViewView> {
+
+
 }

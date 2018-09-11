@@ -35,8 +35,7 @@
                 android:id="@+id/iv_setting_modify_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="10dp"
-                android:background="@mipmap/steam_logo" />
+                android:layout_marginRight="10dp"/>
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -61,6 +60,7 @@
         android:layout_marginTop="1dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/view_avatar_password_line">
 
         <TextView

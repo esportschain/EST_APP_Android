@@ -2,7 +2,6 @@ package common.esportschain.esports.weight;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.Gravity;

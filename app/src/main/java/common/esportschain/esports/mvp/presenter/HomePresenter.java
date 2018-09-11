@@ -1,20 +1,12 @@
 package common.esportschain.esports.mvp.presenter;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.youcheng.publiclibrary.base.BaseResultBean;
 import com.youcheng.publiclibrary.retrofit.ApiCallback;
 
-import org.json.JSONObject;
-
-import common.esportschain.esports.EsportsApplication;
 import common.esportschain.esports.base.MyPresenter;
 import common.esportschain.esports.mvp.model.HomeModel;
-import common.esportschain.esports.mvp.model.LoginModel;
 import common.esportschain.esports.mvp.model.NullModel;
 import common.esportschain.esports.mvp.view.HomeView;
-import common.esportschain.esports.utils.ToastUtil;
 
 /**
  * @author liangzhaoyou
@@ -24,28 +16,21 @@ import common.esportschain.esports.utils.ToastUtil;
 public class HomePresenter extends MyPresenter<HomeView> {
 
     public void getHomeData(String param, String sig, String c, String d, String m, String page) {
-        mvpView.showLoading();
+//        mvpView.showLoading();
         addSubscription(apiStores.getMineData(param, sig, c, d, m, page), new ApiCallback<HomeModel>() {
             @Override
             public void onSuccess(HomeModel model) {
-                mvpView.dismissLoading();
+//                mvpView.dismissLoading();
                 if (model.getCode() == BaseResultBean.RESULT_SUCCESS) {
-                    //{"d":"App","c":"Pubg","m":"detail","accountname":"4564"}
                     mvpView.getHomeData(model);
                 } else {
-                    ToastUtil.showToast(model.getInfo());
+//                    ToastUtil.showToast(model.getInfo());
                 }
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 mvpView.dismissLoading();
-                if ("HTTP 401 Unauthorized".equals(msg)) {
-                    /**
-                     * 根据项目需求处理
-                     */
-                }
-                Toast.makeText(EsportsApplication.getInstance(), msg, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -57,24 +42,33 @@ public class HomePresenter extends MyPresenter<HomeView> {
             public void onSuccess(NullModel model) {
                 mvpView.dismissLoading();
                 if (model.getCode() == BaseResultBean.RESULT_SUCCESS) {
-                    //{"d":"App","c":"Pubg","m":"detail","accountname":"4564"}
                     mvpView.postDeviceToken(model);
-                } else {
-                    ToastUtil.showToast(model.getInfo());
                 }
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 mvpView.dismissLoading();
-                if ("HTTP 401 Unauthorized".equals(msg)) {
-                    /**
-                     * 根据项目需求处理
-                     */
-                }
-                Toast.makeText(EsportsApplication.getInstance(), msg, Toast.LENGTH_LONG).show();
             }
         });
     }
 
+
+    public void msgRead(String param, String sig, String c, String d, String m, String pid) {
+        mvpView.showLoading();
+        addSubscription(apiStores.msgRead(param, sig, c, d, m, pid), new ApiCallback<NullModel>() {
+            @Override
+            public void onSuccess(NullModel model) {
+                mvpView.dismissLoading();
+                if (model.getCode() == BaseResultBean.RESULT_SUCCESS) {
+                    mvpView.postDeviceToken(model);
+                }
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
+                mvpView.dismissLoading();
+            }
+        });
+    }
 }

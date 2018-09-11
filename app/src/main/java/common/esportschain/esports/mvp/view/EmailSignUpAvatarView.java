@@ -3,7 +3,6 @@ package common.esportschain.esports.mvp.view;
 import com.youcheng.publiclibrary.base.BaseView;
 
 import common.esportschain.esports.mvp.model.EmailSignUpAvatarModel;
-import common.esportschain.esports.mvp.model.EmailSignUpModel;
 
 /**
  *

@@ -16,12 +16,14 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import common.esportschain.esports.R;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.AccountSharedPreferences;
+import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.mvp.model.EmailSignUpPasswordModel;
 import common.esportschain.esports.mvp.presenter.EmailSignUpPasswordPresenter;
 import common.esportschain.esports.mvp.view.EmailSignUpPasswordView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.request.AuthParam;
 import common.esportschain.esports.request.AuthSIG;
 import common.esportschain.esports.utils.MD5Util;
@@ -29,7 +31,6 @@ import common.esportschain.esports.utils.PwdCheckUtil;
 import common.esportschain.esports.utils.ToastUtil;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/13
  * <p>
@@ -123,12 +124,17 @@ public class EmailSignUpPasswordActivity extends MvpActivity<EmailSignUpPassword
                             mNewPassword = etSignUpOnePassword.getText().toString();
                             mPNewPassword = etSignUpTwoPassword.getText().toString();
                             if (PwdCheckUtil.isLetterDigit(mNewPassword) && PwdCheckUtil.isLetterDigit(mPNewPassword)) {
-                                Intent intent = new Intent(this, EmailSignUpAvatarActivity.class);
-                                intent.putExtra("new_password", mNewPassword);
-                                intent.putExtra("pnew_password", mPNewPassword);
-                                startActivity(intent);
+                                if (PwdCheckUtil.isLetterDigitSpecial(mNewPassword) && PwdCheckUtil.isLetterDigitSpecial(mPNewPassword)) {
+                                    AccountSharedPreferences.setPassWord(mNewPassword);
+                                    Intent intent = new Intent(this, EmailSignUpAvatarActivity.class);
+                                    intent.putExtra("new_password", mNewPassword);
+                                    intent.putExtra("pnew_password", mPNewPassword);
+                                    startActivity(intent);
+                                } else {
+                                    ToastUtil.showToast(getResources().getString(R.string.password_digits));
+                                }
                             } else {
-                                ToastUtil.showToast(getResources().getString(R.string.password_digits));
+                                ToastUtil.showToast(getResources().getString(R.string.password_letters));
                             }
                         } else {
                             ToastUtil.showToast(getResources().getString(R.string.password_twice_is_inconsistent));
@@ -148,17 +154,37 @@ public class EmailSignUpPasswordActivity extends MvpActivity<EmailSignUpPassword
                                 mPNewPassword = etSignUpTwoPassword.getText().toString();
                                 mOldPassword = etSignUpOldPassword.getText().toString();
                                 if (PwdCheckUtil.isLetterDigit(mNewPassword) && PwdCheckUtil.isLetterDigit(mPNewPassword)) {
-                                    mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
-                                    mSig = AuthSIG.AuthToken("Member", "App", "modifyPwd",
-                                            userInfo.getAuthkeys() + "", userInfo.getUId(), userInfo.getToken());
+                                    if (PwdCheckUtil.isLetterDigitSpecial(mNewPassword) && PwdCheckUtil.isLetterDigitSpecial(mPNewPassword)) {
+                                        String ps = AccountSharedPreferences.getPassWord();
+                                        if (ps.equals(mOldPassword)) {
 
-                                    mMD5NewPassword = MD5Util.encodeMD5(mNewPassword);
-                                    mMD5PNewPassword = MD5Util.encodeMD5(mPNewPassword);
-                                    mMd5OldPassword = MD5Util.encodeMD5(mOldPassword);
+                                            if (!ps.equals(mNewPassword) && !ps.equals(mPNewPassword)) {
 
-                                    mvpPresenter.postModifyPassword(mParam, mSig, mMd5OldPassword, mMD5NewPassword, mMD5PNewPassword);
+                                                mMD5NewPassword = MD5Util.encodeMD5(mNewPassword);
+                                                mMD5PNewPassword = MD5Util.encodeMD5(mPNewPassword);
+                                                mMd5OldPassword = MD5Util.encodeMD5(mOldPassword);
+
+                                                mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
+
+                                                mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_MODIFY_PASSWORD,
+                                                        "old_pwd", mMd5OldPassword, "new_pwd", mMD5NewPassword, "rnew_pwd", mMD5PNewPassword,
+                                                        userInfo.getAuthkeys(), mParam);
+
+                                                mvpPresenter.postModifyPassword(mParam, mSig, mMd5OldPassword, mMD5NewPassword, mMD5PNewPassword);
+                                            } else {
+                                                ToastUtil.showToast(getResources().getString(R.string.new_ps_can_old_ps));
+                                            }
+
+                                        } else {
+                                            ToastUtil.showToast(getResources().getString(R.string.old_ps_error_new_ps));
+                                        }
+
+                                    } else {
+                                        ToastUtil.showToast(getResources().getString(R.string.password_digits));
+
+                                    }
                                 } else {
-                                    ToastUtil.showToast(getResources().getString(R.string.password_digits));
+                                    ToastUtil.showToast(getResources().getString(R.string.password_letters));
                                 }
                             } else {
                                 ToastUtil.showToast(getResources().getString(R.string.password_twice_is_inconsistent));
@@ -178,12 +204,13 @@ public class EmailSignUpPasswordActivity extends MvpActivity<EmailSignUpPassword
 
     /**
      * 修改密码之后的回调
+     *
      * @param emailSignUpPasswordModel
      */
     @Override
     public void postModifyPassword(EmailSignUpPasswordModel emailSignUpPasswordModel) {
         ToastUtil.showToast(getResources().getString(R.string.modify_password_success));
-        finish();
+        logoutDialog();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -198,5 +225,15 @@ public class EmailSignUpPasswordActivity extends MvpActivity<EmailSignUpPassword
         super.onDestroy();
         //注销注册
         EventBus.getDefault().unregister(this);
+    }
+
+    private void logoutDialog() {
+        new UserInfoDbManger().deleteAll();
+        AccountSharedPreferences.setIsLogin(false);
+        AccountSharedPreferences.setEmailLogin(false);
+        AccountSharedPreferences.setPassWord("");
+        finish();
+        Intent intent = new Intent(mActivity, LoginActivity.class);
+        startActivity(intent);
     }
 }

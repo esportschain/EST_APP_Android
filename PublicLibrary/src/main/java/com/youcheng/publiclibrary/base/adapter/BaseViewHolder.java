@@ -15,6 +15,22 @@ public class BaseViewHolder extends RecyclerView.ViewHolder{
     public BaseViewHolder(View itemView) {
         super(itemView);
         this.mView = itemView;
+
+        /*
+//         * 设置水波纹背景
+//         */
+//        if (itemView.getBackground() == null) {
+//            TypedValue typedValue = new TypedValue();
+//            Resources.Theme theme = itemView.getContext().getTheme();
+//            int top = itemView.getPaddingTop();
+//            int bottom = itemView.getPaddingBottom();
+//            int left = itemView.getPaddingLeft();
+//            int right = itemView.getPaddingRight();
+//            if (theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)) {
+//                itemView.setBackgroundResource(typedValue.resourceId);
+//            }
+//            itemView.setPadding(left, top, right, bottom);
+//        }
     }
 
     public View getView() {

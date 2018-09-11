@@ -54,36 +54,39 @@ public final class Environment {
     }
 
     /**
-
+     * 获取系统版本号
      */
     public int getOSVersionCode() {
         return Build.VERSION.SDK_INT;
     }
 
     /**
-  
+     * 获取手机型号
      */
     public String getMobileType() {
         return Build.MODEL;
     }
 
     /**
-   
+     * 获取系统代号
      */
     public String getOSVersionName() {
         return Build.VERSION.RELEASE;
     }
 
     /**
-
+     * 获取系统唯一标志
      */
     public String getPhoneModel() {
         return Build.MODEL;
     }
 
     /**
+     * 获取屏幕宽度
+     * <p>
+     * 上下文
      *
-     * @return 
+     * @return 屏幕宽度（单位：px）
      */
     public int getScreenWidth() {
         if (0 == mScreenWidth) {
@@ -99,7 +102,7 @@ public final class Environment {
     }
 
     /**
-
+     * 获取SD卡的路径
      */
     public String getSDPath() {
         if (isExternalStorageAvailable()) {
@@ -110,7 +113,7 @@ public final class Environment {
     }
 
     /**
-
+     * 判断外部存储器是否可用
      */
     public boolean isExternalStorageAvailable() {
         return android.os.Environment.getExternalStorageState().equals(
@@ -118,14 +121,20 @@ public final class Environment {
     }
 
     /**
-
+     * 获取外部存储器的路径
      */
     public String getExternalStorageDirectory() {
         return android.os.Environment.getExternalStorageDirectory()
                 .getAbsolutePath();
     }
 
-
+    /**
+     * 获取屏幕高度
+     * <p>
+     * 上下文
+     *
+     * @return 屏幕高度（单位：px）
+     */
     public int getScreenHeight() {
         if (0 == mScreenHeight) {
 
@@ -140,7 +149,9 @@ public final class Environment {
 
     }
 
-  
+    /***
+     * 获取应用的名称
+     */
     public String getApplicationName() {
         try {
             PackageManager pm = mContext.getPackageManager();
@@ -155,8 +166,13 @@ public final class Environment {
         return "";
     }
 
-  
-     
+    /**
+     * 获取应用的版本号
+     * <p>
+     * 上下文
+     *
+     * @return
+     */
     public int getMyVersionCode() {
         try {
             PackageManager pm = mContext.getPackageManager();
@@ -173,7 +189,7 @@ public final class Environment {
 
         TelephonyManager tm = (TelephonyManager) mContext
                 .getSystemService(Context.TELEPHONY_SERVICE);
-        String imsi = tm.getSubscriberId();
+        String imsi = tm.getSubscriberId();//获取手机IMSI号
         if (!TextUtils.isEmpty(imsi)) {
             return imsi;
         } else {
@@ -209,7 +225,7 @@ public final class Environment {
             for (; null != str; ) {
                 str = input.readLine();
                 if (str != null) {
-                    macSerial = str.trim();
+                    macSerial = str.trim();// 去空格
                     break;
                 }
             }
@@ -247,7 +263,13 @@ public final class Environment {
         return builder.toString();
     }
 
-
+    /**
+     * 获取应用的版本代号
+     * <p>
+     * 上下文
+     *
+     * @return
+     */
     public String getMyVersionName() {
         try {
             PackageManager pm = mContext.getPackageManager();
@@ -260,13 +282,15 @@ public final class Environment {
         return null;
     }
 
-   
+    /**
+     * 获取包名
+     */
     public String getPackageName() {
         return mContext.getPackageName();
     }
 
     public boolean isNetworkAvailable() {
-  
+        // 获取系统的连接服务
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
@@ -274,23 +298,27 @@ public final class Environment {
     }
 
     public boolean isWifi() {
-      
+        // 获取系统的连接服务
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-  
+        // 获取网络的连接情况
         NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetInfo != null
                 && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI;
     }
 
-
+    /**
+     * 获取IMEI号
+     */
     public String getIMEI() {
         TelephonyManager tm = (TelephonyManager) mContext
                 .getSystemService(Context.TELEPHONY_SERVICE);
         return tm.getDeviceId();
     }
 
-
+    /**
+     * 获取IP地址
+     */
     public String getIPAddress() {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface
@@ -301,7 +329,7 @@ public final class Environment {
                     InetAddress inetAddress = enumIpAddr.nextElement();
                     if (!inetAddress.isLoopbackAddress()) {
                         String ip = inetAddress.getHostAddress();
-                        if (!ip.contains("::") && !ip.contains(":")) {
+                        if (!ip.contains("::") && !ip.contains(":")) {// ipV6的地址
                             return ip;
                         }
                     }
@@ -428,6 +456,11 @@ public final class Environment {
         this.listeners = listeners;
     }
 
+    /**
+     * 获得渠道号
+     *
+     * @return
+     */
     public String getChannel() {
         ApplicationInfo appInfo = null;
         String msg = "CHANNEL_UNKNOW";

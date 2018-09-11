@@ -4,17 +4,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.youcheng.publiclibrary.base.BaseView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -25,15 +33,15 @@ import butterknife.OnClick;
 import common.esportschain.esports.EsportsApplication;
 import common.esportschain.esports.R;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.AccountSharedPreferences;
-import common.esportschain.esports.event.BindEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.AccountSharedPreferences;
+import common.esportschain.esports.event.BindEvent;
 import common.esportschain.esports.mvp.model.LoginModel;
 import common.esportschain.esports.mvp.presenter.BindWebViewPresenter;
 import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.request.AuthParam;
-import common.esportschain.esports.request.AuthSIG;
+import common.esportschain.esports.utils.AndroidBug5497Workaround;
 import common.esportschain.esports.utils.ToastUtil;
 
 /**
@@ -41,7 +49,7 @@ import common.esportschain.esports.utils.ToastUtil;
  * @date 2018/6/21
  */
 
-public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
+public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> implements BaseView {
 
     @BindView(R.id.tv_title)
     TextView tvTitle;
@@ -52,6 +60,9 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
     @BindView(R.id.bind_wb)
     WebView wbBind;
 
+    @BindView(R.id.bind_web_loading)
+    RelativeLayout rlLoading;
+
     private String mUrl;
     private String mParam;
     private String mSig;
@@ -59,6 +70,10 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
     private String encodeParam;
 
     private JavaScriptInterface javaScriptInterface;
+
+    private int webViewProgress;
+    private CountDownTimer timer;
+    private boolean isError = false;
 
     /**
      * 1 steam 登录 2 FaceBook 登录 3 邮箱登录绑定登录状态
@@ -73,6 +88,7 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidBug5497Workaround.assistActivity(this);
         Intent intent = getIntent();
         mStatus = intent.getStringExtra("login_status");
         mType = intent.getStringExtra("login_type");
@@ -80,10 +96,25 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        wbBind.stopLoading();
+        wbBind.destroy();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+    }
+
+    @Override
     public void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         tvTitle.setText(getResources().getString(R.string.bind_title));
         ivBack.setImageResource(R.mipmap.back);
+        clearWebViewCache();
+        timer();
     }
 
     @Override
@@ -102,14 +133,8 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
         if (new UserInfoDbManger().loadAll().size() != 0) {
             userInfo = new UserInfoDbManger().loadAll().get(0);
             mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
-
-            mSig = AuthSIG.AuthTokens("Member", "App", "thirdLogin",
-                    userInfo.getAuthkeys() + "", userInfo.getUId(), userInfo.getToken(), mStatus);
         } else {
             mParam = AuthParam.AuthParam("", "");
-
-            mSig = AuthSIG.AuthTokens("Member", "App", "thirdLogin",
-                    "-1", "", "", mStatus);
         }
 
         try {
@@ -133,10 +158,47 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
         wbBind.addJavascriptInterface(javaScriptInterface, "JsUtils");
 
         wbBind.setWebViewClient(new WebViewClient() {
+            /**
+             * 在应用内加载网页
+             * @param view
+             * @param url
+             * @return
+             */
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) { //  重写此方法表明点击网页里面的链接还是在当前的webview里跳转，不跳到浏览器那边
                 view.loadUrl(url);
                 return true;
+            }
+
+            /**
+             * webview 加载失败
+             * @param view
+             * @param request
+             * @param error
+             */
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                view.setVisibility(View.GONE);
+                isError = true;
+                timer();
+            }
+        });
+
+        wbBind.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int progress) {
+                //当进度走到100的时候做自己的操作，我这边是弹出dialog
+                webViewProgress = progress;
+                if (progress == 100) {
+                    if (rlLoading.getVisibility() != View.GONE) {
+                        rlLoading.setVisibility(View.GONE);
+                    }
+                } else {
+                    if (rlLoading.getVisibility() != View.VISIBLE) {
+                        rlLoading.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         });
 
@@ -162,17 +224,6 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
             EsportsApplication.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
-
-                    Log.e("输出bind获取的参数", string + "");
-
-                    //{"ret":0,"code":0,"msg":"success","data":
-                    // {"uid":1,
-                    // "nickname":"hq",
-                    // "token":"x6kp4OCnO3ngVhz9m2/MzbnAWfW2/CXFdsRk31/wtZu86NO5k/iCGCVl",
-                    // "authkey":"38d6f254d1e4352a21a8352942644005",
-                    // "avatar":"http://www.esportschain.com/uploads/avatar/1.png"
-                    // }
-                    // }
 
                     LoginModel loginModel = new Gson().fromJson(string, LoginModel.class);
 
@@ -203,10 +254,38 @@ public class BindWebViewActivity extends MvpActivity<BindWebViewPresenter> {
                         EventBus.getDefault().post(new BindEvent("1"));
                         finish();
                     }
-
                 }
             });
         }
+    }
+
+    public void clearWebViewCache() {
+        // 清除cookie即可彻底清除缓存
+        CookieSyncManager.createInstance(this);
+        CookieManager.getInstance().removeAllCookie();
+    }
+
+    public void timer() {
+        //倒计时
+        timer = new CountDownTimer(10 * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (isError) {
+                    rlLoading.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                if (webViewProgress < 100) {
+                    ToastUtil.showToast(getResources().getString(R.string.connection_fail));
+                    finish();
+                } else if (isError) {
+                    ToastUtil.showToast(getResources().getString(R.string.connection_fail));
+                    finish();
+                }
+            }
+        }.start();
     }
 }
 

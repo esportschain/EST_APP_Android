@@ -1,7 +1,6 @@
 package common.esportschain.esports.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.widget.TextView;
 
 import com.youcheng.publiclibrary.base.adapter.BaseRecyclerAdapter;

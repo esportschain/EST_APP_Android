@@ -110,8 +110,32 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
+        <!--绑定用户昵称显示界面-->
+        <activity
+            android:name=".ui.home.BindPubgAccountActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <!--上传图片认证-->
+        <activity
+            android:name=".ui.wallet.VerifyAccountActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
         <!--友盟推送自定义接收通知-->
         <service android:name=".upush.MyPushIntentService" />
+
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="common.esportschain.esports.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
     </application>
 
 </manifest>

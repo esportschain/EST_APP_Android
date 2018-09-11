@@ -11,7 +11,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,20 +26,20 @@ import butterknife.OnClick;
 import common.esportschain.esports.EsportsApplication;
 import common.esportschain.esports.R;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.AccountSharedPreferences;
-import common.esportschain.esports.event.ModifyAvatarEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.AccountSharedPreferences;
+import common.esportschain.esports.event.ModifyAvatarEvent;
 import common.esportschain.esports.mvp.model.SettingModel;
 import common.esportschain.esports.mvp.presenter.SettingPresenter;
 import common.esportschain.esports.mvp.view.SettingView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.request.AuthParam;
 import common.esportschain.esports.request.AuthSIG;
 import common.esportschain.esports.ui.login.EmailSignUpPasswordActivity;
 import common.esportschain.esports.ui.login.LoginActivity;
 import common.esportschain.esports.utils.GlideUtil;
 import common.esportschain.esports.utils.MPermissionUtils;
-import common.esportschain.esports.utils.ToastUtil;
 import common.esportschain.esports.weight.CustomizeDialog;
 import common.esportschain.esports.weight.EditAvatarDialog;
 
@@ -72,10 +71,16 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
     private String mParam;
     private String mSig;
     private UserInfo userInfo;
+    private String type;
+    private String mAvatarUrl;
 
     @Override
+
     public void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
+
+        Intent intent = getIntent();
+        mAvatarUrl = intent.getStringExtra("avatar_url");
         tvTitle.setText(getResources().getString(R.string.setting_title));
         ivBack.setImageResource(R.mipmap.back);
     }
@@ -83,8 +88,13 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
     @Override
     public void initData() {
         super.initData();
+
+        if (AccountSharedPreferences.getEmailLogin()) {
+            llSettingPassword.setVisibility(View.VISIBLE);
+        }
+
         userInfo = new UserInfoDbManger().loadAll().get(0);
-        GlideUtil.loadRandImg(mActivity, userInfo.getAvatar(), ivSettingModifyAvatar);
+        GlideUtil.loadRandImg(mActivity, mAvatarUrl, ivSettingModifyAvatar);
     }
 
     @Override
@@ -149,9 +159,9 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
                     new MPermissionUtils.OnPermissionListener() {
                         @Override
                         public void onPermissionGranted() {
-                            Log.e("获取到应用权限", "=====");
                             String outFileFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
-                            String outFilePath = "ESCAVATAR" + ".png";
+                            String currentTime = String.valueOf(System.currentTimeMillis());
+                            String outFilePath = currentTime + ".png";
                             File file = new File(outFileFolder, outFilePath);
                             absolutePath = file.getAbsolutePath();
                             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -162,16 +172,17 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
 
                         @Override
                         public void onPermissionDenied() {
-                            Log.e("没有获取获取到应用权限", "+++++");
                             MPermissionUtils.showTipsDialog(mActivity);
                         }
 
                     });
         } else {
             String outFileFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
-            String outFilePath = "ESCAVATAR" + ".png";
+            String currentTime = String.valueOf(System.currentTimeMillis());
+            String outFilePath = currentTime + ".png";
             File file = new File(outFileFolder, outFilePath);
             absolutePath = file.getAbsolutePath();
+
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             Uri uri = Uri.fromFile(file);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
@@ -200,6 +211,7 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
                         }
                     });
         } else {
+
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, 100);
         }
@@ -224,17 +236,21 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
             Cursor cursor = getContentResolver().query(uri, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 absolutePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                String aa = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                type = aa.substring(absolutePath.length() - 3, absolutePath.length());
+
                 if (!TextUtils.isEmpty(absolutePath)) {
                     cropPhoto();
                 }
             }
-        } else if (requestCode == 500) {
+        } else if (requestCode == 500 && resultCode == RESULT_OK) {
             UserInfo userInfo = new UserInfoDbManger().loadAll().get(0);
             mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
-            mSig = AuthSIG.AuthToken("Member", "App", "modifyAvatar",
-                    userInfo.getAuthkeys() + "", userInfo.getUId(), userInfo.getToken());
+            mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_SMODIFY_AVATAR,
+                    "", "", "", "", "", "", userInfo.getAuthkeys(), mParam);
 
-            mvpPresenter.postModifyAvatar(mParam, mSig, "Member", "App", "modifyAvatar", absolutePath);
+            mvpPresenter.photoCompression(mParam, mSig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_SMODIFY_AVATAR,
+                    mActivity, absolutePath, type);
         }
     }
 
@@ -251,10 +267,10 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
         //裁剪的宽高的比例为1:1
         intent.putExtra("scale", true);
         intent.putExtra("circleCrop", true);
-        intent.putExtra("aspectX", 700);
-        intent.putExtra("aspectY", 699);
-        intent.putExtra("outputX", 700);
-        intent.putExtra("outputY", 699);
+        intent.putExtra("aspectX", 400);
+        intent.putExtra("aspectY", 400);
+        intent.putExtra("outputX", 400);
+        intent.putExtra("outputY", 400);
         intent.putExtra("return-data", false);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.PNG.toString());
         intent.putExtra("noFaceDetection", true);
@@ -265,10 +281,10 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
 
     @Override
     public void postModifyAvatar(final SettingModel settingModel) {
-
         userInfo = new UserInfoDbManger().loadAll().get(0);
         userInfo.setAvatar(settingModel.getResult().getAvatar());
         new UserInfoDbManger().update(userInfo);
+        type = "";
         EsportsApplication.runOnUIThread(new Runnable() {
             @Override
             public void run() {
@@ -276,8 +292,6 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
             }
         });
         EventBus.getDefault().post(new ModifyAvatarEvent("1"));
-
-        ToastUtil.showToast(settingModel.getResult().getAvatar());
     }
 
     private void logoutDialog() {
@@ -295,9 +309,10 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
         customDialog.setOnPositiveListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AccountSharedPreferences.setIsLogin(false);
-                Log.e("输出退出登录时状态", AccountSharedPreferences.getIsLogin() + "");
                 new UserInfoDbManger().deleteAll();
+                AccountSharedPreferences.setIsLogin(false);
+                AccountSharedPreferences.setEmailLogin(false);
+                AccountSharedPreferences.setPassWord("");
                 customDialog.dismiss();
                 finish();
                 Intent intent = new Intent(mActivity, LoginActivity.class);
@@ -306,6 +321,7 @@ public class SettingActivity extends MvpActivity<SettingPresenter> implements Se
         });
         customDialog.show();
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

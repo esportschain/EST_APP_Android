@@ -19,7 +19,9 @@
     <color name="text_E0_color_00">#E0000000</color>
     <color name="text_FF_color_FF">#FFFFFFFF</color>
     <color name="text_61_color_00">#61000000</color>
+    <color name="text_CC_color_00">#CC000000</color>
     <color name="text_FF_color_FA">#FA4731</color>
     <color name="text_FF_color_38">#38C151</color>
+    <color name="text_FF_color_DE">#FFDE5353</color>
 
 </resources>

@@ -2,8 +2,10 @@ package com.youcheng.publiclibrary.base;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.support.multidex.MultiDex;
 
 import com.youcheng.publiclibrary.utils.Environment;
@@ -30,6 +32,12 @@ public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //android7.0 调用相机crash问题
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+        }
+
         mContext = this;
         /**
          *  初始化环境

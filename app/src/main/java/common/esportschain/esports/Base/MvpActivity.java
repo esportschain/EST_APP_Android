@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
-
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.message.PushAgent;
 import com.youcheng.publiclibrary.base.BaseActivity;

@@ -51,24 +51,31 @@ public class MyPushIntentService extends UmengMessageService {
             Log.e("输出友盟统计的数据", msg.title + "\n" + msg.ticker + "\n" + msg.text + "\n" + messageType + "\n" + messageMsg + "\n");
 
             intentAct.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-         
+            //展示通知
             showNotifications(context, msg, intentAct);
 
-
+            // 对完全自定义消息的处理方式，点击或者忽略
             boolean isClickOrDismissed = true;
             if (isClickOrDismissed) {
-
+                //完全自定义消息的点击统计
                 UTrack.getInstance(getApplicationContext()).trackMsgClick(msg);
             } else {
-
+                //完全自定义消息的忽略统计
                 UTrack.getInstance(getApplicationContext()).trackMsgDismissed(msg);
             }
 
         } catch (Exception e) {
-
+//            UmLog.e(TAG, e.getMessage());
         }
     }
 
+    /**
+     * 自定义通知布局
+     *
+     * @param context 上下文
+     * @param msg     消息体
+     * @param intent  intent
+     */
     public void showNotifications(Context context, UMessage msg, Intent intent) {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);

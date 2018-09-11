@@ -3,7 +3,6 @@ package common.esportschain.esports.ui.login;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,19 +17,19 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import common.esportschain.esports.R;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.SignUpEvent;
 import common.esportschain.esports.mvp.model.EmailSignUpModel;
 import common.esportschain.esports.mvp.presenter.EmailSignUpPresenter;
 import common.esportschain.esports.mvp.view.EmailSignUpView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.request.AuthParam;
 import common.esportschain.esports.request.AuthSIG;
 import common.esportschain.esports.utils.EmailCheckUtils;
 import common.esportschain.esports.utils.ToastUtil;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/13
  * 邮箱注册
@@ -59,6 +58,13 @@ public class EmailSignUpActivity extends MvpActivity<EmailSignUpPresenter> imple
         super.onCreate(savedInstanceState);
         //注册订阅者
         EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //注销注册
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -107,12 +113,6 @@ public class EmailSignUpActivity extends MvpActivity<EmailSignUpPresenter> imple
             new UserInfoDbManger().update(userInfo2);
         }
 
-        for (int i = 0; i < new UserInfoDbManger().loadAll().size(); i++) {
-            UserInfo userInfo = new UserInfoDbManger().loadAll().get(i);
-            Log.e("输出数据库的数据", userInfo.getEmail() + "==");
-            Log.e("输出数据库的数据", userInfo.getOneInt() + "==");
-        }
-
         pushActivity(this, EmailSignUpCodeActivity.class);
         ToastUtil.showToast(getResources().getString(R.string.code_been_send));
     }
@@ -126,7 +126,8 @@ public class EmailSignUpActivity extends MvpActivity<EmailSignUpPresenter> imple
                 mEmail = etSignUpInputEmail.getText().toString();
                 if (EmailCheckUtils.checkEmail(mEmail)) {
                     mParam = AuthParam.AuthParam("", "");
-                    mSig = AuthSIG.AuthToken("Member", "App", "sendVcode", "-1", "", "");
+                    mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_SEND_VCODE,
+                            "email", mEmail, "", "", "", "", "-1", mParam);
                     mvpPresenter.getCode(mParam, mSig, mEmail);
                 } else {
                     ToastUtil.showToast(getResources().getString(R.string.email_format_is_incorrect));
@@ -144,10 +145,4 @@ public class EmailSignUpActivity extends MvpActivity<EmailSignUpPresenter> imple
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //注销注册
-        EventBus.getDefault().unregister(this);
-    }
 }

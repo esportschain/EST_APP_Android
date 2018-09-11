@@ -145,7 +145,9 @@ public final class HttpLoggingInterceptorM implements Interceptor {
         boolean logBody = level == Level.BODY;
         boolean logHeaders = logBody || level == Level.HEADERS;
 
-  
+        /*
+            打印开始开始请求
+         */
         RequestBody requestBody = request.body();
         boolean hasRequestBody = requestBody != null;
 
@@ -159,7 +161,9 @@ public final class HttpLoggingInterceptorM implements Interceptor {
 
         logger.log("start sending Request: " + requestStartMessage, LogUtil.D);
 
-  
+        /*
+            请求中,计算请求时间并打印
+         */
         long startNs = System.nanoTime();
         Response response;
         try {
@@ -170,7 +174,9 @@ public final class HttpLoggingInterceptorM implements Interceptor {
         }
         long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
 
-     
+        /*
+            请求完后打印RequestBody
+         */
         LogUtilHelper.printDivider(LogInterceptor.INTERCEPTOR_TAG_STR);
         logger.log(requestStartMessage, LogUtil.D);
 
@@ -224,7 +230,9 @@ public final class HttpLoggingInterceptorM implements Interceptor {
             }
         }
 
-
+        /*
+            请求完后打印ResponseBody
+         */
         ResponseBody responseBody = response.body();
         long contentLength = responseBody.contentLength();
         String bodySize = contentLength != -1 ? contentLength + "-byte" : "unknown-length";

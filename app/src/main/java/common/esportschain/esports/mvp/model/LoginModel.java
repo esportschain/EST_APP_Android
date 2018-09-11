@@ -2,8 +2,6 @@ package common.esportschain.esports.mvp.model;
 
 import com.youcheng.publiclibrary.base.BaseClassResultBean;
 
-import java.util.List;
-
 /**
  *
  * @author liangzhaoyou

@@ -1,8 +1,8 @@
 package common.esportschain.esports;
 
 import android.content.Intent;
-import android.os.Handler;
 import android.os.Bundle;
+import android.os.Handler;
 
 import common.esportschain.esports.base.MvpActivity;
 import common.esportschain.esports.event.AccountSharedPreferences;
@@ -32,7 +32,7 @@ public class MainActivity extends MvpActivity<NullPresenter> {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
+                //判断是否第一次进入
                 if (AccountSharedPreferences.getIsLogin()) {
                     pushActivity(mActivity, HomeActivity.class);
                     finish();

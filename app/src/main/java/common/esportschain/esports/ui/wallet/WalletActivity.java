@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -28,10 +29,10 @@ import common.esportschain.esports.EsportsApplication;
 import common.esportschain.esports.R;
 import common.esportschain.esports.adapter.WalletListAdapter;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.UMPushEvent;
-import common.esportschain.esports.event.WithdrawWalletTransactionEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.UMPushEvent;
+import common.esportschain.esports.event.WithdrawWalletTransactionEvent;
 import common.esportschain.esports.mvp.model.NullModel;
 import common.esportschain.esports.mvp.model.WalletModel;
 import common.esportschain.esports.mvp.model.WalletTexModel;
@@ -71,7 +72,6 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
     private String mParam;
     private String mSig;
     private int page = 1;
-    private String mMoney;
 
     private String etWalletAddress;
 
@@ -83,12 +83,11 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
     private WithdrawWalletTransactionDialog withdrawWalletTransactionDialog;
     private CustomizeDialog mCustomizeDialog;
     private CustomizeDialog mBalanceNoEnoughDialog;
+    private String mMoney;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        mMoney = intent.getStringExtra("wallet_money");
         //注册观察者
         EventBus.getDefault().register(this);
     }
@@ -98,8 +97,8 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
         super.initData();
         userInfo = new UserInfoDbManger().loadAll().get(0);
         mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
-        mSig = AuthSIG.AuthToken(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET,
-                userInfo.getAuthkeys() + "", userInfo.getUId(), userInfo.getToken());
+        mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET,
+                ApiStores.APP_PAGE, "1", "", "", "", "", userInfo.getAuthkeys(), mParam);
 
         mvpPresenter.getWalletData(mParam, mSig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET, String.valueOf(page));
     }
@@ -126,11 +125,13 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
         if (view.equals(ivBack)) {
             finish();
         } else if (view.equals(tvWithdrawToMyWallet)) {
-            double moneyDouble = Double.parseDouble(mMoney);
-            if (moneyDouble > 0.0) {
-                inputAddress();
-            } else {
-                balanceNotEnough();
+            if (null != mMoney) {
+                double moneyDouble = Double.parseDouble(mMoney);
+                if (30.0 <= moneyDouble) {
+                    inputAddress();
+                } else {
+                    balanceNotEnough();
+                }
             }
         }
     }
@@ -143,6 +144,7 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
     @Override
     public void getWalletData(WalletModel walletModel) {
         isEnd = walletModel.getResult().getIsEnd();
+        mMoney = walletModel.getResult().getMoney();
         walletModelList.clear();
         walletModelList = walletModel.getResult().getList();
         initRecyclerView();
@@ -157,8 +159,8 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
     public void getWalletWithdrawWallet(NullModel nullModel) {
         //请求成功刷新界面
         mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
-        mSig = AuthSIG.AuthToken(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET,
-                userInfo.getAuthkeys() + "", userInfo.getUId(), userInfo.getToken());
+        mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET,
+                ApiStores.APP_PAGE, "1", "", "", "", "", userInfo.getAuthkeys(), mParam);
 
         mvpPresenter.getWalletData(mParam, mSig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET, String.valueOf(page));
         //关闭所有的dialog
@@ -173,7 +175,15 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
      */
     @Override
     public void getWalletTax(WalletTexModel walletTexModel) {
-        showConfirmTex(walletTexModel.getResult().getMessage());
+        if ("3".equals(walletTexModel.getResult().getStatus())) {
+            //关闭所有的dialog
+            EventBus.getDefault().post(new WithdrawWalletTransactionEvent("1"));
+            Intent intent = new Intent(mActivity, VerifyAccountActivity.class);
+            intent.putExtra("bindid", walletTexModel.getResult().getBindid());
+            startActivity(intent);
+        } else if ("2".equals(walletTexModel.getResult().getStatus())) {
+            showConfirmTex(walletTexModel.getResult().getMessage());
+        }
     }
 
     /**
@@ -202,7 +212,6 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void withdrawSuccess(final UMPushEvent event) {
-        Log.e("显示event接收的请求", event.mMsg + "==" + event.mType);
         EsportsApplication.runOnUIThread(new Runnable() {
             @Override
             public void run() {
@@ -289,11 +298,11 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
             @Override
             public void onClick(View v) {
                 mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
-                mSig = AuthSIG.AuthToken(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_PUTFORWARD,
-                        userInfo.getAuthkeys() + "", userInfo.getUId(), userInfo.getToken());
+                mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_PUTFORWARD,
+                        "address", address, "type", "1", "", "", userInfo.getAuthkeys(), mParam);
                 //手续费请求
-                mvpPresenter.showTexDialog(mParam, mSig, ApiStores.APP_C_MEMBER,
-                        ApiStores.APP_D_APP, ApiStores.APP_M_PUTFORWARD, address, "1");
+                mvpPresenter.showTexDialog(mParam, mSig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP,
+                        ApiStores.APP_M_PUTFORWARD, address, "1");
             }
         });
         withdrawWalletTransactionDialog.show();
@@ -314,8 +323,8 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
             @Override
             public void onClick(View v) {
                 mParam = AuthParam.AuthParam(userInfo.getUId(), userInfo.getToken());
-                mSig = AuthSIG.AuthToken(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_PUTFORWARD,
-                        userInfo.getAuthkeys() + "", userInfo.getUId(), userInfo.getToken());
+                mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_PUTFORWARD,
+                        "address", etWalletAddress, "type", "2", "", "", userInfo.getAuthkeys(), mParam);
                 mvpPresenter.putForWord(mParam, mSig, ApiStores.APP_C_MEMBER,
                         ApiStores.APP_D_APP, ApiStores.APP_M_PUTFORWARD, etWalletAddress, "2");
                 mCustomizeDialog.dismiss();
@@ -370,6 +379,8 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 page = 1;
+                mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET,
+                        ApiStores.APP_PAGE, "1", "", "", "", "", userInfo.getAuthkeys(), mParam);
                 mvpPresenter.getWalletData(mParam, mSig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET, String.valueOf(page));
                 refreshLayout.finishRefresh(1000);
             }
@@ -384,6 +395,8 @@ public class WalletActivity extends MvpActivity<WalletPresenter> implements Wall
             @Override
             public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
                 page++;
+                mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET,
+                        ApiStores.APP_PAGE, String.valueOf(page), "", "", "", "", userInfo.getAuthkeys(), mParam);
                 mvpPresenter.getWalletData(mParam, mSig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_WALLET, String.valueOf(page));
                 refreshLayout.finishLoadMore(1000);
             }

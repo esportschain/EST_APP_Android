@@ -1,13 +1,10 @@
 package common.esportschain.esports.request;
 
-import android.util.Log;
-
 import common.esportschain.esports.utils.DateTimeUtils;
 import common.esportschain.esports.utils.DeviceUuidFactory;
 import common.esportschain.esports.utils.GetVersionNumber;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/13
  */
@@ -32,7 +29,6 @@ public class AuthParam {
         String mDateTime = DateTimeUtils.getTime();
 
         String param = uuid + "|" + "and" + "|" + "200" + "|" + versionCode + "|" + "1" + "|" + mDateTime + "|" + uid + "|" + token;
-        Log.e("输出param数据", param + "===");
         return param;
     }
 

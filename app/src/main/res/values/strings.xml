@@ -2,7 +2,7 @@
 
     <string name="app_name">Esports</string>
 
-    <string name="sign_up_code_time">Resend (%1$s)</string>
+    <string name="sign_up_code_time">Resend (%1$sS)</string>
     <string name="take_picture">Camera</string>
     <string name="photo_album">Album</string>
     <string name="cancel">Cancel</string>
@@ -29,7 +29,7 @@
     <string name="finish">Finish</string>
     <string name="inbox_and_enter_verification">Check inbox and enter verification code</string>
     <string name="old_password">Set old password</string>
-    <string name="password_instructions">6-8 numbers or letters</string>
+    <string name="password_instructions">6-16 numbers or letters</string>
     <string name="set_your_password">Set your password</string>
     <string name="enter_your_password_again">Enter your password again</string>
     <string name="est_to_eht_wallet">Withdraw EST to my ETH Wallet</string>
@@ -52,7 +52,7 @@
 
     <!--UI界面-->
     <string name="est">&#160;&#160;EST</string>
-    <string name="bind_title">Bind</string>
+    <string name="bind_title">LOG IN</string>
     <string name="game_detail_title">PUBG Stats</string>
     <string name="email_login_title">Log in with Email</string>
     <!--邮箱格式不正确-->
@@ -69,7 +69,8 @@
     <string name="modify_password_success">Password has been updated</string>
     <string name="please_enter_your_email">please enter your email</string>
     <!--//The password must be between 6-16 digits, Alphanumeric combination-->
-    <string name="password_digits">The password must be between 6-16 digits, Alphanumeric combination</string>
+    <string name="password_letters">The password must be between 6-16 digits, Alphanumeric combination</string>
+    <string name="password_digits">Your password must contain a mix of numbers, letters and special characters</string>
 
     <string name="login_success">login success</string>
     <string name="sign_up_title">Sign up with email</string>
@@ -102,11 +103,11 @@
     <string name="recent_match">Recent Matches</string>
     <!--刷新控件英文定义-->
     <string name="header_pulling">pull down to refresh</string>
-    <string name="header_refreshing">release to refresh…</string>
+    <string name="header_refreshing">refreshing…</string>
     <string name="header_loading">refreshing…</string>
-    <string name="header_release">release immediate refresh</string>
-    <string name="header_finish">release complete</string>
-    <string name="header_failed">release failed</string>
+    <string name="header_release">release to refresh</string>
+    <string name="header_finish">refresh complete</string>
+    <string name="header_failed">refresh failed</string>
     <string name="header_update">\'Last update\' M-d HH:mm</string>
 
     <string name="footer_pulling">pull up to load more</string>
@@ -117,10 +118,39 @@
     <string name="footer_failed">failed to load</string>
     <string name="footer_nothing">no more data</string>
 
+    <string name="bind_pudg_edittext_input">Enter your PUBG Nickname</string>
+    <string name="bind_pudg_content">You have to make sure this PUBG account belongs to you, if you use others PUBG account, you will get into trouble when you withdraw EST to your ETH address. We need to verify your PUBG account when you withdraw EST. Once your nickname is confirmed, you could‘t change account anymore. </string>
+    <string name="bind_pudg_title">IMPORTANT STATEMENTS</string>
+
+    <string name="upload">UpLoad</string>
+    <string name="verify_title">Verify your PUBG account</string>
+    <string name="bind_account_prompt">the nickname you submitted last time is not exist, please resubmit PUBG nickname.</string>
+    <string name="bind_account">Bind account</string>
+    <string name="bind_account_title">Jeffrey McGuire</string>
+    <string name="bind_account_activity_title">Bind PUBG Account</string>
+    <string name="in_progress">in progress</string>
+    <string name="click_to_change">Click to change</string>
+    <string name="pubg">PUBG</string>
+    <string name="tips">Tips</string>
+    <string name="old_ps_error_new_ps">The original password was entered incorrectly.</string>
+    <string name="new_ps_can_old_ps">The new password cannot be the same as the original password.</string>
+    <string name="input_email">Please input your email</string>
+    <string name="input_email_ap">Include numbers, letters and special characters</string>
+    <string name="input_email_password">Include numbers, letters and special characters</string>
+    <!--加载中...-->
+    <string name="loading">loading...</string>
+    <!--链接失败-->
+    <string name="connection_fail">Connection Fail</string>
+    <!--登录-->
+    <string name="login">Login</string>
+
+
     <!--没有权限提示信息-->
     <string name="prompt_message">Prompt message</string>
     <string name="app_lacks">The current app lacks the necessary permissions and is temporarily unavailable. If necessary, click the [OK] button to go to the Settings Center for authorization.</string>
 
 
-
+    <!--挖矿-->
+    <string name="mining_instruction">Mining Instruction</string>
+    <string name="show_mining">Every game stats you played today(0:00-24:00) will be calculate to a HashRate according to EST\'s algorithm, and these HashRates will be used to mine EST at 1am the next morning. HashRates of the day before yesterday are useless.</string>
 </resources>

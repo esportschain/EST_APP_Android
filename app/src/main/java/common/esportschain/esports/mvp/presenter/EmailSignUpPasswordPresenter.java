@@ -10,10 +10,10 @@ import common.esportschain.esports.base.MyPresenter;
 import common.esportschain.esports.mvp.model.EmailSignUpCodeModel;
 import common.esportschain.esports.mvp.model.EmailSignUpPasswordModel;
 import common.esportschain.esports.mvp.view.EmailSignUpPasswordView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.utils.ToastUtil;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/13
  */
@@ -30,7 +30,6 @@ public class EmailSignUpPasswordPresenter extends MyPresenter<EmailSignUpPasswor
                         mvpView.dismissLoading();
                         if (model.getCode() == BaseResultBean.RESULT_SUCCESS && model.getRet() == BaseResultBean.RESULT_RET_SUCCESS) {
                             EmailSignUpCodeModel testModel = model;
-//                            mvpView.(testModel);
                         } else {
                             ToastUtil.showToast(model.getInfo());
                         }
@@ -52,6 +51,7 @@ public class EmailSignUpPasswordPresenter extends MyPresenter<EmailSignUpPasswor
 
     /**
      * postModifyPassword
+     *
      * @param param
      * @param sig
      * @param oldPassword
@@ -61,7 +61,7 @@ public class EmailSignUpPasswordPresenter extends MyPresenter<EmailSignUpPasswor
     public void postModifyPassword(String param, String sig, String oldPassword, String newPassword, String rNewPassword) {
         mvpView.showLoading();
 
-        addSubscription(apiStores.postMidifyPassword(param, sig, "Member", "App", "modifyPwd", oldPassword, newPassword, rNewPassword),
+        addSubscription(apiStores.postMidifyPassword(param, sig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_MODIFY_PASSWORD, oldPassword, newPassword, rNewPassword),
                 new ApiCallback<EmailSignUpPasswordModel>() {
                     @Override
                     public void onSuccess(EmailSignUpPasswordModel model) {

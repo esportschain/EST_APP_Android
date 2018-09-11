@@ -1,7 +1,6 @@
 package common.esportschain.esports.ui.login;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,13 +13,14 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import common.esportschain.esports.R;
 import common.esportschain.esports.base.MvpActivity;
-import common.esportschain.esports.event.AccountSharedPreferences;
-import common.esportschain.esports.event.LoginEvent;
 import common.esportschain.esports.database.UserInfo;
 import common.esportschain.esports.database.UserInfoDbManger;
+import common.esportschain.esports.event.AccountSharedPreferences;
+import common.esportschain.esports.event.LoginEvent;
 import common.esportschain.esports.mvp.model.EmailLoginModel;
 import common.esportschain.esports.mvp.presenter.EmailLoginPresenter;
 import common.esportschain.esports.mvp.view.EmailLoginView;
+import common.esportschain.esports.request.ApiStores;
 import common.esportschain.esports.request.AuthParam;
 import common.esportschain.esports.request.AuthSIG;
 import common.esportschain.esports.ui.home.HomeActivity;
@@ -30,7 +30,6 @@ import common.esportschain.esports.utils.PwdCheckUtil;
 import common.esportschain.esports.utils.ToastUtil;
 
 /**
- *
  * @author liangzhaoyou
  * @date 2018/6/12
  */
@@ -82,17 +81,25 @@ public class EmailLoginActivity extends MvpActivity<EmailLoginPresenter> impleme
         } else if (view.equals(btLogIn)) {
             if (etEmail.getText() != null) {
                 if (etPassword.getText() != null) {
-                    if (EmailCheckUtils.checkEmail(etEmail.getText().toString())) {
-                        if (PwdCheckUtil.isLetterDigit(etPassword.getText().toString())) {
-                            mParam = AuthParam.AuthParam("", "");
-                            mSig = AuthSIG.AuthToken("Member", "App", "login", "-1", "", "");
-                            mEmail = etEmail.getText().toString();
-                            mPassword = etPassword.getText().toString();
-                            mMD5Password = MD5Util.encodeMD5(mPassword);
-                            mvpPresenter.getEmailLoginData(mParam, mSig, "Member", "App", "login", mEmail, mMD5Password);
 
+                    mParam = AuthParam.AuthParam("", "");
+                    mEmail = etEmail.getText().toString();
+                    mPassword = etPassword.getText().toString();
+                    mMD5Password = MD5Util.encodeMD5(mPassword);
+
+                    if (EmailCheckUtils.checkEmail(mEmail)) {
+                        if (PwdCheckUtil.isLetterDigit(mPassword)) {
+//                            if (PwdCheckUtil.isLetterDigitSpecial(mPassword)) {
+                                mSig = AuthSIG.getRequestSig(ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP, ApiStores.APP_M_LOGIN,
+                                        "email", mEmail, "pwd", mMD5Password, "", "", "-1", mParam);
+
+                                mvpPresenter.getEmailLoginData(mParam, mSig, ApiStores.APP_C_MEMBER, ApiStores.APP_D_APP,
+                                        ApiStores.APP_M_LOGIN, mEmail, mMD5Password);
+//                            } else {
+//                                ToastUtil.showToast(getResources().getString(R.string.password_digits));
+//                            }
                         } else {
-                            ToastUtil.showToast(getResources().getString(R.string.password_digits));
+                            ToastUtil.showToast(getResources().getString(R.string.password_letters));
                         }
                     } else {
                         ToastUtil.showToast(getResources().getString(R.string.email_format_is_incorrect));
@@ -127,18 +134,9 @@ public class EmailLoginActivity extends MvpActivity<EmailLoginPresenter> impleme
             new UserInfoDbManger().update(userInfo2);
         }
 
-        for (int i = 0; i < new UserInfoDbManger().loadAll().size(); i++) {
-            UserInfo userInfo2 = new UserInfoDbManger().loadAll().get(i);
-            Log.e("输出DB保存的信息", userInfo2.getEmail() + "\n" +
-                    userInfo2.getAvatar() + "\n" +
-                    userInfo2.getKey() + "\n" +
-                    userInfo2.getNickName() + "\n" +
-                    userInfo2.getToken() + "\n" +
-                    userInfo2.getAuthkey() + "\n" +
-                    userInfo2.getUId());
-        }
-
         AccountSharedPreferences.setIsLogin(true);
+        AccountSharedPreferences.setEmailLogin(true);
+        AccountSharedPreferences.setPassWord(mPassword);
         ToastUtil.showToast(getResources().getString(R.string.login_success));
         EventBus.getDefault().post(new LoginEvent("1"));
         pushActivity(this, HomeActivity.class);

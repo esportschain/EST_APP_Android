@@ -38,27 +38,84 @@ public class PwdCheckUtil {
     /**
      * 规则2：至少包含大小写字母及数字中的两种6-16之间
      * 是否包含
+     * `-=[]\;,./~!@#$%^*()_+}{:?&amp;&lt;&gt;&quot;&apos;
      *
      * @param str
      * @return
      */
     public static boolean isLetterDigit(String str) {
-        //定义一个boolean值，用来表示是否包含数字
+//        //定义一个boolean值，用来表示是否包含数字
+//        boolean isDigit = false;
+//        //定义一个boolean值，用来表示是否包含字母
+//        boolean isLetter = false;
+//        for (int i = 0; i < str.length(); i++) {
+//            //用char包装类中的判断数字的方法判断每一个字符
+//            if (Character.isDigit(str.charAt(i))) {
+//                isDigit = true;
+//                //用char包装类中的判断字母的方法判断每一个字符
+//            } else if (Character.isLetter(str.charAt(i))) {
+//                isLetter = true;
+//            }
+//        }
+//        //(?=.*?[a-z])(?=.*?[0-9])[a-zA-Z0-9_]
+//        String regex = "^(?=.*?[a-z])(?=.*?[0-9])[a-zA-Z0-9_]{6,16}$";
+//        boolean isRight = isDigit && isLetter && str.matches(regex);
+//        return isRight;
+
+        if (str.length() >= 6 && str.length() <= 16) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 判断字符串中是否含有数字字母特殊字符
+     *
+     * @param str
+     * @return
+     */
+
+    public static boolean isLetterDigitSpecial(String str) {
         boolean isDigit = false;
-        //定义一个boolean值，用来表示是否包含字母
         boolean isLetter = false;
+        boolean isSpecial = false;
+        //循环遍历字符串
         for (int i = 0; i < str.length(); i++) {
             //用char包装类中的判断数字的方法判断每一个字符
             if (Character.isDigit(str.charAt(i))) {
                 isDigit = true;
-                //用char包装类中的判断字母的方法判断每一个字符
-            } else if (Character.isLetter(str.charAt(i))) {
+            }
+            //用char包装类中的判断字母的方法判断每一个字符
+            if (Character.isLetter(str.charAt(i))) {
                 isLetter = true;
             }
         }
-        String regex = "^(?=.*?[a-z])(?=.*?[0-9])[a-zA-Z0-9_]{6,16}$";
-        boolean isRight = isDigit && isLetter && str.matches(regex);
-        return isRight;
+
+        String regEx = "[ _`~!@#$%*?~@#%*&-]|\n|\r|\t";
+//        String regEx = "~!@#$%^&*?-_";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        isSpecial = m.find();
+
+        if (isDigit && isLetter && isSpecial) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 判断是否含有特殊字符
+     *
+     * @param str
+     * @return true为包含，false为不包含
+     */
+    private static boolean isSpecialChar(String str) {
+        String regEx = "~!@#$%^&*?";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        return m.find();
     }
 
     /**

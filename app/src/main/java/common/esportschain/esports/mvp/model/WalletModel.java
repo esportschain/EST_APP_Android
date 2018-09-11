@@ -15,6 +15,15 @@ public class WalletModel extends BaseClassResultBean<WalletModel.Object> {
     public class Object {
         private String isEnd;
         private List<WalletItemModel> list;
+        private String money;
+
+        public String getMoney() {
+            return money;
+        }
+
+        public void setMoney(String money) {
+            this.money = money;
+        }
 
         public String getIsEnd() {
             return isEnd;
